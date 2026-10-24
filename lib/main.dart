@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Screens/DestinationsScreen.dart';
+import 'package:flutter_application_1/Screens/SignupScreen.dart';
 
 void main() {
   runApp(const WanderlyApp());
@@ -33,6 +34,7 @@ class _WanderlyAppState extends State<WanderlyApp> {
         ),
       ),
       home: StartScreen(onToggleTheme: _toggleTheme),
+      // home: Signupscreen(),
       debugShowCheckedModeBanner: false,
     );
   }
@@ -71,9 +73,7 @@ class StartScreen extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => const Destinationsscreen(),
-                  ),
+                  MaterialPageRoute(builder: (context) => Signupscreen()),
                 );
               },
               child: Text("Start Exploring"),
