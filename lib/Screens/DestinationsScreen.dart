@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter_application_1/Screens/BucketListScreen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 // const List<Map<String, String>> restaurants = [
 //   {'title': 'The Alchemist', 'genre': 'Fiction'},
@@ -15,6 +17,7 @@ class Destination {
   final String region;
   final int population;
   final String flagUrl;
+  bool isFavorite = false;
 
   Destination({
     required this.name,
@@ -49,11 +52,33 @@ class Destinationsscreen extends StatefulWidget {
 
 class _DestinationState extends State<Destinationsscreen> {
   List<Destination> destinations = [];
+  Set<String> favoriteNames = {};
+  final SharedPreferencesAsync _prefs = SharedPreferencesAsync();
+  static const _favKey = 'favorite_destinations';
 
   @override
   void initState() {
     super.initState();
+    _loadFavorites();
     fetchDestinations();
+  }
+
+  void _toggleFavorite(String name) {
+    setState(() {
+      if (favoriteNames.contains(name)) {
+        favoriteNames.remove(name);
+      } else {
+        favoriteNames.add(name);
+      }
+      _prefs.setStringList(_favKey, favoriteNames.toList());
+    });
+  }
+
+  Future<void> _loadFavorites() async {
+    final favorites = await _prefs.getStringList(_favKey) ?? [];
+    setState(() {
+      favoriteNames = favorites.toSet();
+    });
   }
 
   Future<void> fetchDestinations() async {
@@ -87,13 +112,37 @@ class _DestinationState extends State<Destinationsscreen> {
               leading: FlagImage(url: d.flagUrl),
               title: Text(d.name),
               subtitle: Text('${d.capital}, ${d.region}, ${d.population}'),
+              trailing: IconButton(
+                icon: favoriteNames.contains(d.name)
+                    ? Icon(Icons.favorite, color: Colors.blueAccent)
+                    : Icon(Icons.favorite_border),
+                iconSize: 20,
+                onPressed: () => _toggleFavorite(d.name),
+              ),
             ),
           );
         },
       );
     }
     return Scaffold(
-      appBar: AppBar(title: const Text("Explore Restaurants")),
+      appBar: AppBar(
+        title: const Text("Explore Restaurants"),
+        actions: [
+          IconButton(
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => Bucketlistscreen(
+                  savedDestinations: destinations
+                      .where((d) => favoriteNames.contains(d.name))
+                      .toList(),
+                ),
+              ),
+            ),
+            icon: Icon(Icons.bookmark),
+          ),
+        ],
+      ),
       body: body,
     );
   }

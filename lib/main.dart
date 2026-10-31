@@ -59,12 +59,15 @@ class StartScreen extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            CircleAvatar(child: Icon(Icons.restaurant_menu)),
+            CircleAvatar(
+              child: Icon(Icons.restaurant_menu, size: 50),
+              radius: 35,
+            ),
             Text(
               "Wanderly",
               style: TextStyle(
                 fontWeight: FontWeight.bold,
-                fontSize: 20,
+                fontSize: 24,
                 color: Colors.white,
               ),
             ),
